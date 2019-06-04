@@ -12,7 +12,7 @@ virutalenv env
 pip install -r requirements.txt
 ```
 
-MacOS users will also need to install libomp to get PyTorch working
+MacOS users will also need to install libomp to get PyTorch working due to [issue #20030](https://github.com/pytorch/pytorch/issues/20030)
 ```
 brew install libomp
 ```
