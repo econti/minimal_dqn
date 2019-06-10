@@ -154,28 +154,24 @@ def update_bayes_reg_posterior(blr_params, params, replay_buffer, agent):
         # can be used, we set alpha to 1 which means do not use the past moment
         blr_params.phiphiT *= 1 - blr_params.alpha
         blr_params.phiY *= 1 - blr_params.alpha
-        for _ in range(params.target_batch_size):
-            # sample a minibatch of size one from replay buffer
-            state, action, reward, next_state, done = replay_buffer.sample(1)
-            state = torch.tensor(np.float32(state[0])).type(dtype).unsqueeze(0)
-            next_state = (
-                torch.tensor(np.float32(next_state[0])).type(dtype).unsqueeze(0)
-            )
-            action = action[0]
-            reward = torch.tensor(reward[0]).type(dtype)
-            done = torch.tensor(done[0]).type(dtype)
 
-            blr_params.phiphiT[int(action)] += torch.mm(
-                agent.q_network(state).transpose(0, 1), agent.q_network(state)
-            )
-            target_q_values = torch.mm(
-                blr_params.E_W_target,
-                agent.target_q_network(next_state).transpose(0, 1),
-            )
-            max_target_q = torch.max(target_q_values)
-            blr_params.phiY[int(action)] += agent.q_network(state).transpose(
-                0, 1
-            ).squeeze() * (reward + (1.0 - done) * params.gamma * max_target_q)
+        state, action, reward, next_state, done = replay_buffer.sample(1024)
+        state = torch.tensor(np.float32(state[0])).type(dtype).unsqueeze(0)
+        next_state = torch.tensor(np.float32(next_state[0])).type(dtype).unsqueeze(0)
+        action = action[0]
+        reward = torch.tensor(reward[0]).type(dtype)
+        done = torch.tensor(done[0]).type(dtype)
+
+        blr_params.phiphiT[int(action)] += torch.mm(
+            agent.q_network(state).transpose(0, 1), agent.q_network(state)
+        )
+        target_q_values = torch.mm(
+            blr_params.E_W_target, agent.target_q_network(next_state).transpose(0, 1)
+        )
+        max_target_q = torch.max(target_q_values)
+        blr_params.phiY[int(action)] += agent.q_network(state).transpose(
+            0, 1
+        ).squeeze() * (reward + (1.0 - done) * params.gamma * max_target_q)
 
         for i in range(agent.num_actions):
             inv = (
@@ -323,3 +319,4 @@ if __name__ == "__main__":
     # ??????????
     parser.add_argument("--target_batch_size", type=int, default=5000)
     run_gym(parser.parse_args())
+
