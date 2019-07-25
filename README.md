@@ -36,15 +36,6 @@ python main.py \
     --epsilon_decay 500 --max_ts 10000 --batch_size 32 --gamma 0.99 --log_every 200
 ```
 
-Bayesian DQN on Atari
-```
-python main.py \
-    --env "PongNoFrameskip-v4" --CnnDQN --learning_rate 0.00001 \
-    --target_update_rate 0.1 --replay_size 100000 --start_train_ts 10000 \
-    --epsilon_start 1.0 --epsilon_end 0.01 --epsilon_decay 30000 --max_ts 1400000 \
-    --batch_size 32 --gamma 0.99 --log_every 10000 --BayesianDQN
-```
-
 Some code borrowed from:
  - https://github.com/higgsfield/RL-Adventure
  - https://github.com/kazizzad/BDQN-MxNet-Gluon
